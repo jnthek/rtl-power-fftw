@@ -29,8 +29,23 @@ Datastore::Datastore(const Params& params_, std::vector<float>& window_values_) 
 
   inbuf = (complex*)fftwf_alloc_complex(params.N);
   outbuf = (complex*)fftwf_alloc_complex(params.N);
-  plan = fftwf_plan_dft_1d(params.N, (fftwf_complex*)inbuf, (fftwf_complex*)outbuf,
+
+  if (0 == fftwf_import_wisdom_from_filename(wisdom_fname)) {
+    std::cerr << "pie_wisdom.dat could not be imported, will attempt to create one with FFTW_EXHAUSTIVE ...." << std::endl;
+    plan = fftwf_plan_dft_1d(params.N, (fftwf_complex*)inbuf, (fftwf_complex*)outbuf,
+                      FFTW_FORWARD, FFTW_EXHAUSTIVE);
+    if (0 == fftwf_export_wisdom_to_filename(wisdom_fname)) {
+      std::cerr << "Could not export to pie_wisdom.dat ...." << std::endl;
+    }
+    else{
+      std::cerr << "Wisdom saved as pie_wisdom.dat ...." << std::endl;
+    }
+  }
+  else{
+    std::cerr << "pie_wisdom.dat imported successfully, will try to use FFTW_MEASURE ...." << std::endl; 
+    plan = fftwf_plan_dft_1d(params.N, (fftwf_complex*)inbuf, (fftwf_complex*)outbuf,
                           FFTW_FORWARD, FFTW_MEASURE);
+  }
 }
 
 Datastore::~Datastore() {

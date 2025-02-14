@@ -50,6 +50,7 @@ class Datastore {
 
     complex *inbuf, *outbuf;
     fftwf_plan plan;
+    const char *wisdom_fname = "pie_wisdom.dat";
     std::vector<double> pwr;
 
     Datastore(const Params& params, std::vector<float>& window_values);
